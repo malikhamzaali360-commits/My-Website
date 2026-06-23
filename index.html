@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>Live Flight Tracker</title>
+    <!-- Map ki design file -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; }
@@ -12,28 +13,29 @@
 
     <div id="map"></div>
 
+    <!-- Map chalane wali file -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Map initialize karna
+        // Map shuru karna
         var map = L.map('map').setView([33.68, 73.04], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Flights ka data fetch karna (OpenSky Network)
+        // Planes ka data lane wala function
         async function fetchFlights() {
             try {
                 let response = await fetch('https://opensky-network.org/api/states/all');
                 let data = await response.json();
                 
-                // Sirf pehle 50 jahaz dikhana taaki website hang na ho
-                for(let i = 0; i < 50; i++) {
+                // 200 planes ko map par daalna
+                for(let i = 0; i < 200; i++) { 
                     let flight = data.states[i];
-                    if(flight[6] && flight[5]) { // Latitude aur Longitude check
+                    if(flight[6] && flight[5]) { 
                         L.marker([flight[6], flight[5]]).addTo(map)
-                         .bindPopup("Callsign: " + flight[1]);
+                         .bindPopup("Flight: " + (flight[1] || "Unknown"));
                     }
                 }
             } catch (error) {
-                console.log("Data fetch nahi ho saka:", error);
+                console.log("Planes load nahi ho sake, error check karein.");
             }
         }
 
