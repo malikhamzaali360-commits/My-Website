@@ -2,7 +2,6 @@
 <html>
 <head>
     <title>Live Flight Tracker</title>
-    <!-- Map ki design file -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         body { margin: 0; padding: 0; }
@@ -13,21 +12,20 @@
 
     <div id="map"></div>
 
-    <!-- Map chalane wali file -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Map shuru karna
         var map = L.map('map').setView([33.68, 73.04], 5);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-        // Planes ka data lane wala function
         async function fetchFlights() {
             try {
-                let response = await fetch('https://opensky-network.org/api/states/all');
+                // Yahan humne proxy ka link add kiya hai jo CORS error ko bypass karega
+                let proxyUrl = 'https://corsproxy.io/?';
+                let apiUrl = 'https://opensky-network.org/api/states/all';
+                let response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
                 let data = await response.json();
                 
-                // 200 planes ko map par daalna
-                for(let i = 0; i < 200; i++) { 
+                for(let i = 0; i < 100; i++) { 
                     let flight = data.states[i];
                     if(flight[6] && flight[5]) { 
                         L.marker([flight[6], flight[5]]).addTo(map)
@@ -35,7 +33,7 @@
                     }
                 }
             } catch (error) {
-                console.log("Planes load nahi ho sake, error check karein.");
+                console.log("Abhi bhi error hai, lekin humne try kiya:", error);
             }
         }
 
