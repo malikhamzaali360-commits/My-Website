@@ -1,43 +1,39 @@
- <!DOCTYPE html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-    <title>Live Flight Tracker</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Weather App</title>
     <style>
-        body { margin: 0; padding: 0; }
-        #map { height: 100vh; width: 100%; }
+        body { font-family: sans-serif; background: #0f2027; color: white; text-align: center; padding: 50px; }
+        input { padding: 10px; width: 250px; border-radius: 5px; border: none; }
+        button { padding: 10px; cursor: pointer; background: #00ff41; border: none; border-radius: 5px; }
+        .result { margin-top: 30px; font-size: 1.5em; }
     </style>
 </head>
 <body>
 
-    <div id="map"></div>
+    <h1>Weather Forecast</h1>
+    <input type="text" id="city" placeholder="City ka naam likhein...">
+    <button onclick="getWeather()">Check Weather</button>
 
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <div class="result" id="display"></div>
+
     <script>
-        var map = L.map('map').setView([33.68, 73.04], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+        async function getWeather() {
+            let city = document.getElementById('city').value;
+            let apiKey = '7d0d088924f79661f43c8d1976a9f029'; // Ye public key hai, isse testing ho jayegi
+            let url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
 
-        async function fetchFlights() {
             try {
-                // Yahan humne proxy ka link add kiya hai jo CORS error ko bypass karega
-                let proxyUrl = 'https://corsproxy.io/?';
-                let apiUrl = 'https://opensky-network.org/api/states/all';
-                let response = await fetch(proxyUrl + encodeURIComponent(apiUrl));
+                let response = await fetch(url);
                 let data = await response.json();
-                
-                for(let i = 0; i < 100; i++) { 
-                    let flight = data.states[i];
-                    if(flight[6] && flight[5]) { 
-                        L.marker([flight[6], flight[5]]).addTo(map)
-                         .bindPopup("Flight: " + (flight[1] || "Unknown"));
-                    }
-                }
+                document.getElementById('display').innerHTML = 
+                    `Temperature in ${city}: ${data.main.temp}°C <br> Status: ${data.weather[0].description}`;
             } catch (error) {
-                console.log("Abhi bhi error hai, lekin humne try kiya:", error);
+                document.getElementById('display').innerHTML = "City nahi mili, sahi naam likhein!";
             }
         }
-
-        fetchFlights();
     </script>
 </body>
 </html>
